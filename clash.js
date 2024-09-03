@@ -1,6 +1,6 @@
 const axios = require("axios");
 const fs = require("fs");
-const he = require("he");
+const cheerio = require("cheerio");
 
 const dir = process.env.HOME + "/.cocli";
 if (!fs.existsSync(dir)) fs.mkdirSync(dir);
@@ -57,16 +57,6 @@ const langs = {
   "rb": "Ruby", "vb": "VB.NET"
 };
 
-function prettyHTML(html) {
-  let r = he.unescape(html);
-  r = r.replace(/<br ?\/?>/g, "\n");
-  r = r.replace(/<var>(.*?)<\/var>/g, "\x1b[33m[$1]\x1b[0m");
-  r = r.replace(/<const>(.*?)<\/const>/g, "\x1b[34m[$1]\x1b[0m");
-  r = r.replace(/<strong>(.*?)<\/strong>/g, "\x1b[1m$1\x1b[0m");
-  r = r.replace(/<(.*?)>(.*?)<\/\1>/g, "$2");
-  return r;
-}
-
 (async () => {
 
   const mode = process.argv[2] ?? "status";
@@ -96,6 +86,7 @@ function prettyHTML(html) {
       clash = await api("/ClashOfCode/joinClashByHandle", [userId, join, null]);
     }
     const handle = clash.publicHandle;
+    console.log("Clash handle:", handle);
     console.log("Waiting to start...");
 
     fs.writeFileSync(dir + "/current.json", JSON.stringify({ handle }));
@@ -110,7 +101,10 @@ function prettyHTML(html) {
       was = true;
 
       const me = clash.players.find(p => p.codingamerId == userId);
-      const owner = me.status == "OWNER";
+      const status = me ? (
+        me.status.slice(0, 1).toUpperCase() +
+        me.status.slice(1).toLowerCase()
+      ) : "Left";
 
       let delta = clash.startTimestamp - Date.now();
       const neg = (delta < 0);
@@ -118,7 +112,7 @@ function prettyHTML(html) {
       const sec = (parseInt(delta / 1000) % 60).toString().padStart(2, "0");
       const min = parseInt(delta / 60000);
 
-      console.log("Owner:  ", owner);
+      console.log("Status: ", status);
       console.log("Players:", clash.players.length);
       console.log("Start:  ", min + ":" + sec + (neg ? " ago" : ""));
 
@@ -147,17 +141,28 @@ function prettyHTML(html) {
     if (mode != "Reverse") {
       const s = ques.statement;
 
-      const goal = s.matchAll(/<span class="question-statement">(.*?)<\/span>/sg).toArray()[0][1];
-      lines.push("## Goal", prettyHTML(goal), "");
+      try {
+        const html = cheerio.load(s);
 
-      const inp = s.matchAll(/<div class="question-statement-input">(.*?)<\/div>/sg).toArray()[0][1];
-      lines.push("## Input Format", prettyHTML(inp), "");
-      const out = s.matchAll(/<div class="question-statement-output">(.*?)<\/div>/sg).toArray()[0][1];
-      lines.push("## Output Format", prettyHTML(out), "");
-      const con = s.matchAll(/<div class="question-statement-constraints">(.*?)<\/div>/sg).toArray()[0][1];
-      lines.push("## Constraints", prettyHTML(con), "");
+        html("br").after("<span>\n<span>");
+        html("var,.var").text((_, t) => "\x1b[33m[" + t + "]\x1b[0m");
+        html("const,code,.const").text((_, t) => "\x1b[94m[" + t + "]\x1b[0m");
+        html("b,strong").text((_, t) => "\x1b[1m[" + t + "]\x1b[0m");
 
-      console.log(lines.join("\n").trim());
+        const goal = html(".question-statement").text();
+        lines.push("## Goal", goal, "");
+
+        const inp = html(".question-statement-input").text();
+        lines.push("## Input Format", inp, "");
+        const out = html(".question-statement-output").text();
+        lines.push("## Output Format", out, "");
+        const con = html(".question-statement-constraints").text();
+        lines.push("## Constraints", con, "");
+
+        console.log(lines.join("\n").trim());
+      } catch (error) {
+        console.log(s);
+      }
     }
 
     const tests = [];
@@ -204,9 +209,45 @@ function prettyHTML(html) {
       await new Promise(r => setTimeout(r, 10000));
     }
 
+  } else if (mode == "board") {
+    const { handle } = JSON.parse(fs.readFileSync(dir + "/current.json"));
+    const clash = await api("/ClashOfCode/findClashByHandle", [handle]);
+
+    const working = clash.players.filter(p => p.score == null);
+    const ready = clash.players.filter(p => p.score != null).sort((a, b) => a.rank - b.rank);
+
+    for (const p of ready) {
+      const rank = p.rank.toString().padEnd(3, " ");
+      const score = (p.score + "%").padEnd(4, " ");
+
+      const t = parseInt(p.duration / 1000);
+      const m = parseInt(t / 60);
+      const s = (t % 60).toString().padStart(2, "0");
+      const time = (m + ":" + s).padEnd(5, " ")
+
+      const nick = p.codingamerNickname;
+      const lang = p.languageId.padEnd(11, " ");
+      const crit = (p.criterion ?? "N/A").padEnd(4, " ");
+
+      console.log(rank, time, score, crit, lang, nick);
+    }
+
+    for (const p of working) {
+      const nick = p.codingamerNickname;
+      console.log("???", nick);
+    }
+
   } else if (mode == "start") {
     const { handle } = JSON.parse(fs.readFileSync(dir + "/current.json"));
     await api("/ClashOfCode/startClashByHandle", [userId, handle]);
+
+  } else if (mode == "leave") {
+    const { handle } = JSON.parse(fs.readFileSync(dir + "/current.json"));
+    await api("/ClashOfCode/leaveClashByHandle", [userId, handle]);
+
+  } else if (mode == "rejoin") {
+    const { handle } = JSON.parse(fs.readFileSync(dir + "/current.json"));
+    await api("/ClashOfCode/joinClashByHandle", [userId, handle, null]);
 
   } else if (mode == "submit") {
     const { handle, test, tests } = JSON.parse(fs.readFileSync(dir + "/current.json"));

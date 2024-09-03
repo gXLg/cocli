@@ -41,16 +41,19 @@ Joins a public clash.
 ```
 cocli join <url>
 ```
-Joins a clash by the url.
+Joins a clash by the url and prints out its' handle.
 
 After joining, the command waits
 until the clash starts, prints
 out the statement and then waits
 until the clash is finished.
+If the parser cannot process the
+statement, raw HTML is printed out
+as an emergency solution.
 
 Information while waiting to start:
 ```
-Owner: boolean if you are owner of this clash
+Status: "Owner", "Standard" or "Left" for states of your user in the clash
 Players: the amount of players in the lobby
 Start: time until the clash starts
 ```
@@ -62,11 +65,29 @@ Finish: time until the clash finishes
 Report: link to view the report of the clash in your browser
 ```
 
+### Leaderboard
+```
+cocli board
+```
+Prints out the leaderboard for current clash.
+
 ### Start
 ```
 cocli start
 ```
 Force start the clash if you are the owner.
+
+### Leave
+```
+cocli leave
+```
+Leave the clash.
+
+### Rejoin
+```
+cocli rejoin
+```
+Rejoin previously left clash.
 
 ### Test Cases
 ```
@@ -87,3 +108,5 @@ cocli submit
 ```
 Takes the last modified file in current directory and uploads
 it for submission.
+
+### 

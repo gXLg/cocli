@@ -17,6 +17,14 @@ case "$1" in
     node "$js" start
     ;;
 
+  "leave")
+    node "$js" leave
+    ;;
+
+  "rejoin")
+    node "$js" rejoin
+    ;;
+
   "cases")
     node "$js" cases
     ;;
@@ -29,6 +37,9 @@ case "$1" in
     node "$js" test "$latest"
     ;;
 
+  "board")
+    node "$js" board
+    ;;
 
   *)
     node "$js" "$1" "$2"
