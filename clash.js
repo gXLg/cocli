@@ -214,20 +214,21 @@ const langs = {
     const clash = await api("/ClashOfCode/findClashByHandle", [handle]);
 
     const working = clash.players.filter(p => p.score == null);
-    const ready = clash.players.filter(p => p.score != null).sort((a, b) => a.rank - b.rank);
+    const ready = clash.players.filter(p => p.score != null)
+      .sort((a, b) => (a.rank != b.rank) ? (a.rank - b.rank) : (a.duration - b.duration));
 
     for (const p of ready) {
-      const rank = p.rank.toString().padEnd(3, " ");
-      const score = (p.score + "%").padEnd(4, " ");
+      const rank = p.rank.toString().padStart(3, " ");
+      const score = (p.score + "%").padStart(4, " ");
 
       const t = parseInt(p.duration / 1000);
       const m = parseInt(t / 60);
       const s = (t % 60).toString().padStart(2, "0");
-      const time = (m + ":" + s).padEnd(5, " ")
+      const time = (m + ":" + s).padStart(5, " ")
 
       const nick = p.codingamerNickname;
-      const lang = p.languageId.padEnd(11, " ");
-      const crit = (p.criterion ?? "N/A").padEnd(4, " ");
+      const lang = (p.languageId ?? "N/A").padEnd(11, " ");
+      const crit = (p.criterion ?? "N/A").toString().padEnd(4, " ");
 
       console.log(rank, time, score, crit, lang, nick);
     }
@@ -271,8 +272,13 @@ const langs = {
           "programmingLanguageId": lang
         }
       ]);
-      if (result.comparison.success) {
+      if (result.error && !result.comparison) {
+        console.log("Test #" + testIndex + ":", "\x1b[31mFail\x1b[0m");
+        console.log("Error:", result.error.message);
+        break;
+      } else if (result.comparison.success) {
         console.log("Test #" + testIndex + ":", "\x1b[32mPass\x1b[0m");
+        if (result.error) console.log("Error:", result.error.message);
       } else {
         console.log("Test #" + testIndex + ":", "\x1b[31mFail\x1b[0m");
         console.log("Output:");
