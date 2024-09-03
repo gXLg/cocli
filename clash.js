@@ -8,17 +8,26 @@ if (!fs.existsSync(dir)) fs.mkdirSync(dir);
 const { userId, rememberMe } = JSON.parse(fs.readFileSync(dir + "/config.json"));
 
 async function api(path, body) {
-  const r = await axios.post(
-    "https://www.codingame.com/services" + path,
-    body,
-    {
-      "headers": {
-        "Cookie": "rememberMe=" + rememberMe,
-        "Content-Type": "application/json;charset=utf-8"
+  try {
+    const r = await axios.post(
+      "https://www.codingame.com/services" + path,
+      body,
+      {
+        "headers": {
+          "Cookie": "rememberMe=" + rememberMe,
+          "Content-Type": "application/json;charset=utf-8"
+        }
       }
+    );
+    return r.data;
+  } catch (error) {
+    const r = error.response?.data;
+    if (r?.code == "CLASH-CAPTCHA") {
+      console.log("Captcha required: https://www.codingame.com/clashofcode/captcha");
+      process.exit(1);
     }
-  );
-  return r.data;
+    throw error;
+  }
 }
 
 async function static(id) {
