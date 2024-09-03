@@ -12,7 +12,7 @@ npm install
 ## Config
 Put your Codingamer User ID and Auth Cookie in the
 `~/.cocli/config.json` file in following format:
-```json
+```js
 {
   "userId": number,
   "rememberMe": "string"
