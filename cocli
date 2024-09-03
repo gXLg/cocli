@@ -1,0 +1,37 @@
+#!/bin/bash
+
+js="$(dirname $0)/clash.js"
+latest="$(find . -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d' ')"
+
+case "$1" in
+
+  "" | "status")
+    node "$js" status
+    ;;
+
+  "join")
+    node "$js" join "$2"
+    ;;
+
+  "start")
+    node "$js" start
+    ;;
+
+  "cases")
+    node "$js" cases
+    ;;
+
+  "submit")
+    node "$js" submit "$latest"
+    ;;
+
+  "test")
+    node "$js" test "$latest"
+    ;;
+
+
+  *)
+    node "$js" "$1" "$2"
+    ;;
+
+esac
