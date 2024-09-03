@@ -109,4 +109,17 @@ cocli submit
 Takes the last modified file in current directory and uploads
 it for submission.
 
-### 
+# Personal Setup
+Personally I use this tool to clash on the go from my phone.
+I use the app Termux as a terminal emulator.
+There I have 3 sessions:
+* Status: `clear && cocli join`
+* Editor: `nano file.py`
+* Test: `cocli test`, `cocli board` or `cocli submit`
+
+My current Clash of Code status:
+```
+Nickname:      _dev_null
+Rank:          225 / 718029
+Ranked played: 72
+```

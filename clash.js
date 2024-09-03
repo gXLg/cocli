@@ -83,7 +83,11 @@ const langs = {
       clash = await api("/ClashOfCode/playClash", [userId, null]);
     } else {
       console.log("Joining...");
-      clash = await api("/ClashOfCode/joinClashByHandle", [userId, join, null]);
+      try {
+        clash = await api("/ClashOfCode/joinClashByHandle", [userId, join, null]);
+      } catch (error) {
+        clash = await api("/ClashOfCode/findClashByHandle", [join]);
+      }
     }
     const handle = clash.publicHandle;
     console.log("Clash handle:", handle);
