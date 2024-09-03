@@ -3,6 +3,12 @@ CLI tools collection for Clash of Code
 
 # Usage
 
+## Install
+Clone the repo, then run
+```
+npm install
+```
+
 ## Config
 Put your Codingamer User ID and Auth Cookie in the
 `~/.cocli/config.json` file in following format:
