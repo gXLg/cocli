@@ -120,6 +120,6 @@ There I have 3 sessions:
 My current Clash of Code status:
 ```
 Nickname:      _dev_null
-Rank:          225 / 718029
-Ranked played: 72
+Rank:          111 / 721702
+Ranked played: 115
 ```

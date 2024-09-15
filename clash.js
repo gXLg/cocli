@@ -1,6 +1,5 @@
 const axios = require("axios");
 const fs = require("fs");
-const cheerio = require("cheerio");
 
 const dir = process.env.HOME + "/.cocli";
 if (!fs.existsSync(dir)) fs.mkdirSync(dir);
@@ -76,6 +75,8 @@ const langs = {
     console.log("Ranked played:", user.clashesCount);
 
   } else if (mode == "join") {
+    const cheerio = require("cheerio");
+
     let join = arg ? arg.split("/").slice(-1)[0] : null;
     let clash;
     if (join == null) {
@@ -86,6 +87,7 @@ const langs = {
       try {
         clash = await api("/ClashOfCode/joinClashByHandle", [userId, join, null]);
       } catch (error) {
+        console.log(error);
         clash = await api("/ClashOfCode/findClashByHandle", [join]);
       }
     }
@@ -134,6 +136,12 @@ const langs = {
     console.log("Mode:     ", mode);
     console.log("Languages:", langs);
     console.log("");
+
+    const me = clash.players.find(p => p.codingamerId == userId);
+    if (me == null) {
+      console.log("You left the clash!");
+      return;
+    }
 
     const session = await api("/ClashOfCode/startClashTestSession", [userId, handle]);
     const test = session.handle;

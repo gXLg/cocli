@@ -9,35 +9,39 @@ case "$1" in
     node "$js" status
     ;;
 
-  "join")
+  "join" | "joi" | "jo" | "j")
     node "$js" join "$2"
     ;;
 
-  "start")
+  "start" | "star" | "sta" | "st")
     node "$js" start
     ;;
 
-  "leave")
+  "leave" | "leav" | "lea" | "le" | "l")
     node "$js" leave
     ;;
 
-  "rejoin")
+  "rejoin" | "rejoi" | "rejo" | "rej" | "re" | "r")
     node "$js" rejoin
     ;;
 
-  "cases")
+  "cases" | "case" | "cas" | "ca" | "c")
     node "$js" cases
     ;;
 
-  "submit")
-    node "$js" submit "$latest"
+  "submit" | "submi" | "subm" | "sub" | "su" | "s")
+    node "$js" submit "$latest" || exit
+    name="$(basename $latest)"
+    handle="$(jq .handle -r ~/.cocli/current.json)"
+    mkdir -p ~/.cocli/submissions
+    mv "$latest" ~/.cocli/submissions/"$handle-$name"
     ;;
 
-  "test")
+  "test" | "tes" | "te" | "t")
     node "$js" test "$latest"
     ;;
 
-  "board")
+  "board" | "boar" | "boa" | "bo" | "b")
     node "$js" board
     ;;
 
