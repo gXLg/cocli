@@ -35,7 +35,8 @@ async function static(id) {
     {
       "headers": {
         "Cookie": "rememberMe=" + rememberMe
-      }
+      },
+      "responseType": "text"
     }
   );
   return r.data;
@@ -102,10 +103,6 @@ const langs = {
     while (true) {
       clash = await api("/ClashOfCode/findClashByHandle", [handle]);
 
-      // jump to beginning and clear
-      if (was) process.stdout.write("\x1b[3F\x1b[J");
-      was = true;
-
       const me = clash.players.find(p => p.codingamerId == userId);
       const status = me ? (
         me.status.slice(0, 1).toUpperCase() +
@@ -117,6 +114,10 @@ const langs = {
       if (neg) delta = - delta;
       const sec = (parseInt(delta / 1000) % 60).toString().padStart(2, "0");
       const min = parseInt(delta / 60000);
+
+      // jump to beginning and clear
+      if (was) process.stdout.write("\x1b[3F\x1b[J");
+      was = true;
 
       console.log("Status: ", status);
       console.log("Players:", clash.players.length);
@@ -168,7 +169,7 @@ const langs = {
         lines.push("## Input Format", inp, "");
         const out = html(".question-statement-output").text();
         lines.push("## Output Format", out, "");
-        const con = html(".question-statement-constraints").text();
+        const con = html(".question-statement-constraints").text() ?? "None";
         lines.push("## Constraints", con, "");
 
         console.log(lines.join("\n").trim());
@@ -200,10 +201,6 @@ const langs = {
     while (true) {
       clash = await api("/ClashOfCode/findClashByHandle", [handle]);
 
-      // jump to beginning and clear
-      if (was) process.stdout.write("\x1b[3F\x1b[J");
-      was = true;
-
       const me = clash.players.find(p => p.codingamerId == userId);
       const sub = me.score ? ("Score - " + me.score + "%, place - " + me.rank) : "None yet";
 
@@ -213,9 +210,13 @@ const langs = {
       const sec = (parseInt(delta / 1000) % 60).toString().padStart(2, "0");
       const min = parseInt(delta / 60000);
 
+      // jump to beginning and clear
+      if (was) process.stdout.write("\x1b[3F\x1b[J");
+      was = true;
+
       console.log("Submission:", sub);
       console.log("Finish:    ", min + ":" + sec + (neg ? " ago" : ""));
-      console.log("Report:    ", "codingame.com/clashofcode/clash/report/" + handle);
+      console.log("Report:    ", "gxlg.dev/q/cocr/" + handle);
 
       if (clash.finished) break;
       await new Promise(r => setTimeout(r, 10000));
