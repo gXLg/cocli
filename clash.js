@@ -216,7 +216,7 @@ const langs = {
 
       console.log("Submission:", sub);
       console.log("Finish:    ", min + ":" + sec + (neg ? " ago" : ""));
-      console.log("Report:    ", "gxlg.dev/q/cocr/" + handle);
+      console.log("Report:    ", "https://www.codingame.com/clashofcode/clash/report/" + handle);
 
       if (clash.finished) break;
       await new Promise(r => setTimeout(r, 10000));
