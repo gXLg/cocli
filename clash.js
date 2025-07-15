@@ -104,7 +104,7 @@ const langs = {
       clash = await api("/ClashOfCode/findClashByHandle", [handle]);
 
       const me = clash.players.find(p => p.codingamerId == userId);
-      const status = me ? (
+      const state = me ? (
         me.status.slice(0, 1).toUpperCase() +
         me.status.slice(1).toLowerCase()
       ) : "Left";
@@ -119,7 +119,7 @@ const langs = {
       if (was) process.stdout.write("\x1b[3F\x1b[J");
       was = true;
 
-      console.log("Status: ", status);
+      console.log("State:  ", state);
       console.log("Players:", clash.players.length);
       console.log("Start:  ", min + ":" + sec + (neg ? " ago" : ""));
 
@@ -134,8 +134,8 @@ const langs = {
       clash.programmingLanguages.join(", ") : "All";
 
     console.log("");
-    console.log("Mode:     ", mode);
-    console.log("Languages:", langs);
+    console.log("Mode: ", mode);
+    console.log("Langs:", langs);
     console.log("");
 
     const me = clash.players.find(p => p.codingamerId == userId);
@@ -202,7 +202,7 @@ const langs = {
       clash = await api("/ClashOfCode/findClashByHandle", [handle]);
 
       const me = clash.players.find(p => p.codingamerId == userId);
-      const sub = me.score ? ("Score - " + me.score + "%, place - " + me.rank) : "None yet";
+      const sub = me.score ? ("Score - " + me.score + "%, place - " + me.rank) : "No submission";
 
       let delta = clash.msBeforeEnd;
       const neg = (delta < 0);
@@ -214,13 +214,37 @@ const langs = {
       if (was) process.stdout.write("\x1b[3F\x1b[J");
       was = true;
 
-      console.log("Submission:", sub);
-      console.log("Finish:    ", min + ":" + sec + (neg ? " ago" : ""));
-      console.log("Report:    ", "https://www.codingame.com/clashofcode/clash/report/" + handle);
+      console.log("You: ", sub);
+      console.log("End: ", min + ":" + sec + (neg ? " ago" : ""));
+      console.log("Info:", "https://www.codingame.com/clashofcode/clash/report/" + handle);
 
       if (clash.finished) break;
       await new Promise(r => setTimeout(r, 10000));
     }
+
+  } else if (mode == "info") {
+    const { handle } = JSON.parse(fs.readFileSync(dir + "/current.json"));
+    const clash = await api("/ClashOfCode/findClashByHandle", [handle]);
+    const search = arg?.toLowerCase() ?? "";
+    const player = clash.players.find(p => p.codingamerNickname.toLowerCase().includes(search));
+    if (player == null) {
+      console.log("Player was not found");
+      return;
+    }
+
+    const cr = await api("/ClashOfCode/getClashRankByCodinGamerId", [player.codingamerId]);
+    const info = await api("/CodinGamer/findCodingamePointsStatsByHandle", [player.codingamerHandle]);
+
+    const { pseudo, countryId, tagline, biography } = info.codingamer;
+    const { rank } = cr ?? {};
+
+    console.log(pseudo, countryId, "#" + (rank ?? "?"));
+    if (tagline) console.log(tagline);
+    if (biography) console.log("");
+    for (const l of biography?.split("\n") ?? []) {
+      console.log("|", l);
+    }
+
 
   } else if (mode == "board") {
     const { handle } = JSON.parse(fs.readFileSync(dir + "/current.json"));
