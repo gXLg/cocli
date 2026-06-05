@@ -143,9 +143,10 @@ There I have 3 sessions:
 * Test: `cocli test`, `cocli board` or `cocli submit`
 
 My best Clash of Code status:
-`Fri 5. June 2026, 17:25 CET (Europe/Berlin)`
 ```
 Nickname:      _dev_null
-Rank:          49 / 911296
-Ranked played: 200
+Rank:          42 / 911296
+Ranked played: 201
 ```
+`Fri 5. June 2026, 17:30 CET (Europe/Berlin)`
+[Profile](https://www.codingame.com/profile/56605861297480ffe9836782155b230f3230694)
