@@ -142,9 +142,10 @@ There I have 3 sessions:
 * Editor: `nano file.py`
 * Test: `cocli test`, `cocli board` or `cocli submit`
 
-My current Clash of Code status:
+My best Clash of Code status:
+`Fri 5. June 2026, 17:25 CET (Europe/Berlin)`
 ```
 Nickname:      _dev_null
-Rank:          52 / 819111
-Ranked played: 151
+Rank:          49 / 911296
+Ranked played: 200
 ```
